@@ -1,8 +1,9 @@
 // =====================================================
-// AI PT STORE — MAIN APP (with Chat History)
+// AI PT STORE — MAIN APP (FIXED API KEY)
+// API Key: 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
 // =====================================================
 
-const API_KEY = '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';
+const API_KEY = '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';
 const API_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const MODEL = 'openrouter/auto';
 
@@ -240,7 +241,6 @@ function formatDateGroup(timestamp) {
   const now = new Date();
   const date = new Date(timestamp);
   
-  // Cek valid tanggal
   if (isNaN(date.getTime())) return 'Baru saja';
   
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -277,7 +277,6 @@ function renderHistorySidebar() {
     return;
   }
   
-  // Filter history yang valid (memiliki updatedAt yang valid)
   const validHistory = history.filter(s => s.updatedAt && !isNaN(new Date(s.updatedAt).getTime()));
   
   const groups = {};
@@ -1022,9 +1021,9 @@ async function submitChat() {
       if (!res.ok) {
         const errText = await res.text();
         let errMsg = `Terjadi error (${res.status}).`;
-        if (res.status === 401) errMsg = 'API Key tidak valid. Periksa kembali.';
-        else if (res.status === 429) errMsg = 'Batas penggunaan tercapai. Coba lagi nanti.';
-        else if (res.status === 403) errMsg = 'Akses ditolak.';
+        if (res.status === 401) errMsg = '⚠️ API Key tidak valid. Periksa kembali.';
+        else if (res.status === 429) errMsg = '⚠️ Batas penggunaan tercapai. Coba lagi nanti.';
+        else if (res.status === 403) errMsg = '⚠️ Akses ditolak. Periksa API Key.';
         throw new Error(errMsg);
       }
 
@@ -1040,9 +1039,9 @@ async function submitChat() {
     await animateMessageIn(assistantId, responseText);
 
   } catch (err) {
-    const errMsg = err.message || 'Maaf, terjadi kesalahan. Silakan coba lagi.';
+    const errMsg = err.message || '⚠️ Maaf, terjadi kesalahan. Silakan coba lagi.';
     const idx = chatMessages.findIndex(m => m.id === assistantId);
-    if (idx !== -1) chatMessages[idx] = { id: assistantId, role: 'assistant', content: `⚠️ ${errMsg}`, isThinking: false };
+    if (idx !== -1) chatMessages[idx] = { id: assistantId, role: 'assistant', content: errMsg, isThinking: false };
     renderMessages();
   } finally {
     chatIsLoading = false;
